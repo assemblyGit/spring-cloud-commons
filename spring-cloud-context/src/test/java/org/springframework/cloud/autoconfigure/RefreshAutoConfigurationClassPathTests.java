@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,28 +34,23 @@ import static org.assertj.core.api.BDDAssertions.then;
  * @author Spencer Gibb
  */
 @RunWith(ModifiedClassPathRunner.class)
-@ClassPathExclusions({ "spring-boot-actuator-*.jar",
-		"spring-boot-starter-actuator-*.jar" })
+@ClassPathExclusions({ "spring-boot-actuator-*.jar", "spring-boot-starter-actuator-*.jar" })
 public class RefreshAutoConfigurationClassPathTests {
 
-	private static ConfigurableApplicationContext getApplicationContext(
-			Class<?> configuration, String... properties) {
-		return new SpringApplicationBuilder(configuration).web(WebApplicationType.NONE)
-				.properties(properties).run();
+	private static ConfigurableApplicationContext getApplicationContext(Class<?> configuration, String... properties) {
+		return new SpringApplicationBuilder(configuration).web(WebApplicationType.NONE).properties(properties).run();
 	}
 
 	@Test
 	public void refreshEventListenerCreated() {
-		try (ConfigurableApplicationContext context = getApplicationContext(
-				Config.class)) {
-			then(context.getBeansOfType(RefreshEventListener.class))
-					.as("RefreshEventListeners not created").isNotEmpty();
-			then(context.containsBean("refreshEndpoint")).as("refreshEndpoint created")
-					.isFalse();
+		try (ConfigurableApplicationContext context = getApplicationContext(Config.class)) {
+			then(context.getBeansOfType(RefreshEventListener.class)).as("RefreshEventListeners not created")
+					.isNotEmpty();
+			then(context.containsBean("refreshEndpoint")).as("refreshEndpoint created").isFalse();
 		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 

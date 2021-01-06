@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,12 +60,11 @@ public class CompositeDiscoveryClientAutoConfigurationTests {
 		CompositeDiscoveryClient compositeDiscoveryClient = (CompositeDiscoveryClient) this.discoveryClient;
 		then(compositeDiscoveryClient.getDiscoveryClients().get(0).description())
 				.isEqualTo("A custom discovery client");
-		then(compositeDiscoveryClient.getDiscoveryClients().get(1))
-				.isInstanceOf(SimpleDiscoveryClient.class);
+		then(compositeDiscoveryClient.getDiscoveryClients().get(1)).isInstanceOf(SimpleDiscoveryClient.class);
 	}
 
 	@EnableAutoConfiguration
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class Config {
 
 		@Bean

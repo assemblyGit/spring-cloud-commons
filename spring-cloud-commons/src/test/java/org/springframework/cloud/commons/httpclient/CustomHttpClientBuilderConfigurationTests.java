@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,12 @@ public class CustomHttpClientBuilderConfigurationTests {
 	@Test
 	public void testCustomBuilder() {
 		HttpClientBuilder builder = this.apacheHttpClientFactory.createBuilder();
-		then(CustomHttpClientBuilderApplication.MyHttpClientBuilder.class
-				.isInstance(builder)).isTrue();
+		then(CustomHttpClientBuilderApplication.MyHttpClientBuilder.class.isInstance(builder)).isTrue();
 	}
 
 }
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableAutoConfiguration
 class CustomHttpClientBuilderApplication {
 
@@ -58,7 +57,7 @@ class CustomHttpClientBuilderApplication {
 		SpringApplication.run(MyApplication.class, args);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@AutoConfigureBefore(HttpClientConfiguration.class)
 	static class MyConfig {
 

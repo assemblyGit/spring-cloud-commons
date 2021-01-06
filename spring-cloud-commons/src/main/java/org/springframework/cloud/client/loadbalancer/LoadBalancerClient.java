@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,7 @@ public interface LoadBalancerClient extends ServiceInstanceChooser {
 	 * @return The result of the LoadBalancerRequest callback on the selected
 	 * ServiceInstance.
 	 */
-	<T> T execute(String serviceId, ServiceInstance serviceInstance,
-			LoadBalancerRequest<T> request) throws IOException;
+	<T> T execute(String serviceId, ServiceInstance serviceInstance, LoadBalancerRequest<T> request) throws IOException;
 
 	/**
 	 * Creates a proper URI with a real host and port for systems to utilize. Some systems

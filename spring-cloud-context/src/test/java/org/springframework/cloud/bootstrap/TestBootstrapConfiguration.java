@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import static org.springframework.cloud.bootstrap.TestHigherPriorityBootstrapCon
  * @author Spencer Gibb
  */
 @Order(0)
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties
 public class TestBootstrapConfiguration {
 
@@ -48,8 +48,7 @@ public class TestBootstrapConfiguration {
 
 	@Bean
 	@Qualifier("foo-during-bootstrap")
-	public String fooDuringBootstrap(ConfigurableEnvironment environment,
-			ApplicationEventPublisher publisher) {
+	public String fooDuringBootstrap(ConfigurableEnvironment environment, ApplicationEventPublisher publisher) {
 		String property = environment.getProperty("test.bootstrap.foo", "undefined");
 
 		if (fooSightings != null) {
@@ -66,11 +65,9 @@ public class TestBootstrapConfiguration {
 			@Override
 			public void initialize(ConfigurableApplicationContext applicationContext) {
 				ConfigurableEnvironment environment = applicationContext.getEnvironment();
-				environment.getPropertySources()
-						.addLast(new MapPropertySource("customProperties",
-								Collections.<String, Object>singletonMap("custom.foo",
-										environment.resolvePlaceholders(
-												"${spring.application.name:bar}"))));
+				environment.getPropertySources().addLast(
+						new MapPropertySource("customProperties", Collections.<String, Object>singletonMap("custom.foo",
+								environment.resolvePlaceholders("${spring.application.name:bar}"))));
 			}
 
 		};

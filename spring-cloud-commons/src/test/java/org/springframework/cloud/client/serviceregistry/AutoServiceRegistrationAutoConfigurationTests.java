@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,8 @@ public class AutoServiceRegistrationAutoConfigurationTests {
 
 	@Test
 	public void hasAutoServiceRegistration() {
-		try (AnnotationConfigApplicationContext context = setup(
-				HasAutoServiceRegistrationConfiguration.class)) {
-			AutoServiceRegistration autoServiceRegistration = context
-					.getBean(AutoServiceRegistration.class);
+		try (AnnotationConfigApplicationContext context = setup(HasAutoServiceRegistrationConfiguration.class)) {
+			AutoServiceRegistration autoServiceRegistration = context.getBean(AutoServiceRegistration.class);
 			then(autoServiceRegistration).isNotNull();
 		}
 	}
@@ -55,8 +53,7 @@ public class AutoServiceRegistrationAutoConfigurationTests {
 	@Test
 	public void noAutoServiceRegistrationAndFailFast() {
 		this.exception.expect(BeanCreationException.class);
-		this.exception
-				.expectMessage(Matchers.containsString("no AutoServiceRegistration"));
+		this.exception.expectMessage(Matchers.containsString("no AutoServiceRegistration"));
 		try (AnnotationConfigApplicationContext context = setup(
 				"spring.cloud.service-registry.auto-registration.failFast=true")) {
 			assertNoBean(context);
@@ -71,8 +68,7 @@ public class AutoServiceRegistrationAutoConfigurationTests {
 	}
 
 	private void assertNoBean(AnnotationConfigApplicationContext context) {
-		Map<String, AutoServiceRegistration> beans = context
-				.getBeansOfType(AutoServiceRegistration.class);
+		Map<String, AutoServiceRegistration> beans = context.getBeansOfType(AutoServiceRegistration.class);
 		then(beans).isEmpty();
 	}
 
@@ -94,7 +90,7 @@ public class AutoServiceRegistrationAutoConfigurationTests {
 		return context;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class HasAutoServiceRegistrationConfiguration {
 
 		@Bean

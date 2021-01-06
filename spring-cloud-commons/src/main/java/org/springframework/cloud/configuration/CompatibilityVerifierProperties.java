@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.configuration;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -37,7 +37,7 @@ public class CompatibilityVerifierProperties {
 	 * the patch version if you don't want to specify a concrete value. Example:
 	 * {@code 3.4.x}
 	 */
-	private List<String> compatibleBootVersions = Collections.singletonList("2.1.x");
+	private List<String> compatibleBootVersions = Arrays.asList("2.3.x", "2.4.x");
 
 	public boolean isEnabled() {
 		return this.enabled;

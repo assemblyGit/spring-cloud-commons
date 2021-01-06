@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,7 @@ public class DiscoveredResourceUnitTests {
 
 	@Before
 	public void setUp() {
-		when(this.traversal.buildTraversal(Matchers.any(Traverson.class)))
-				.thenReturn(this.builder);
+		when(this.traversal.buildTraversal(Matchers.any(Traverson.class))).thenReturn(this.builder);
 
 		this.resource = new DiscoveredResource(this.provider, this.traversal);
 		this.resource.setRestOperations(this.operations);
@@ -76,8 +75,8 @@ public class DiscoveredResourceUnitTests {
 
 		Link link = new Link("target", "rel");
 
-		when(this.provider.getServiceInstance()).thenReturn(new DefaultServiceInstance(
-				"instance", "service", "localhost", 8080, false));
+		when(this.provider.getServiceInstance())
+				.thenReturn(new DefaultServiceInstance("instance", "service", "localhost", 8080, false));
 		when(this.builder.asTemplatedLink()).thenReturn(link);
 
 		this.resource.verifyOrDiscover();
@@ -103,8 +102,7 @@ public class DiscoveredResourceUnitTests {
 
 		verificationTriggersDiscovery();
 
-		doThrow(RestClientException.class).when(this.operations)
-				.headForHeaders(anyString());
+		doThrow(RestClientException.class).when(this.operations).headForHeaders(anyString());
 		this.resource.verifyOrDiscover();
 
 		then(this.resource.getLink()).isNull();

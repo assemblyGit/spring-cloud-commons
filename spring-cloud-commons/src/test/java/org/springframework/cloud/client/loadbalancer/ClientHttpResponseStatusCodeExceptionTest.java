@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,13 @@ public class ClientHttpResponseStatusCodeExceptionTest {
 	public void testCreation() throws Exception {
 		MyClientHttpResponse response = new MyClientHttpResponse();
 		then(response.isClosed()).isFalse();
-		ClientHttpResponseStatusCodeException exp = new ClientHttpResponseStatusCodeException(
-				"service", response, response.getStatusText().getBytes());
+		ClientHttpResponseStatusCodeException exp = new ClientHttpResponseStatusCodeException("service", response,
+				response.getStatusText().getBytes());
 		ClientHttpResponse expResponse = exp.getResponse();
 		then(expResponse.getRawStatusCode()).isEqualTo(response.getRawStatusCode());
 		then(expResponse.getStatusText()).isEqualTo(response.getStatusText());
 		then(expResponse.getHeaders()).isEqualTo(response.getHeaders());
-		then(new String(StreamUtils.copyToByteArray(expResponse.getBody())))
-				.isEqualTo(response.getStatusText());
+		then(new String(StreamUtils.copyToByteArray(expResponse.getBody()))).isEqualTo(response.getStatusText());
 	}
 
 	class MyClientHttpResponse extends AbstractClientHttpResponse {

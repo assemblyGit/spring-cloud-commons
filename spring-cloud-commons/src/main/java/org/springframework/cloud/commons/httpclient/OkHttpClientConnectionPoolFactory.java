@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ public interface OkHttpClientConnectionPoolFactory {
 	 * @param timeUnit The time unit for the keep-alive duration.
 	 * @return A new {@link ConnectionPool}.
 	 */
-	ConnectionPool create(int maxIdleConnections, long keepAliveDuration,
-			TimeUnit timeUnit);
+	ConnectionPool create(int maxIdleConnections, long keepAliveDuration, TimeUnit timeUnit);
 
 }

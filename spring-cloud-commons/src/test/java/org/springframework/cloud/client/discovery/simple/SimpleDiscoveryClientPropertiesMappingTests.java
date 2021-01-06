@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,16 +56,13 @@ public class SimpleDiscoveryClientPropertiesMappingTests {
 		then(this.props.getInstances().get("service1").size()).isEqualTo(2);
 		then(this.props.getInstances().get("service1").get(0).getHost()).isEqualTo("s11");
 		then(this.props.getInstances().get("service1").get(0).getPort()).isEqualTo(8080);
-		then(this.props.getInstances().get("service1").get(0).getUri())
-				.isEqualTo(URI.create("http://s11:8080"));
-		then(this.props.getInstances().get("service1").get(0).isSecure())
-				.isEqualTo(false);
+		then(this.props.getInstances().get("service1").get(0).getUri()).isEqualTo(URI.create("http://s11:8080"));
+		then(this.props.getInstances().get("service1").get(0).isSecure()).isEqualTo(false);
 
 		then(this.props.getInstances().get("service2").size()).isEqualTo(2);
 		then(this.props.getInstances().get("service2").get(0).getHost()).isEqualTo("s21");
 		then(this.props.getInstances().get("service2").get(0).getPort()).isEqualTo(8080);
-		then(this.props.getInstances().get("service2").get(0).getUri())
-				.isEqualTo(URI.create("https://s21:8080"));
+		then(this.props.getInstances().get("service2").get(0).getUri()).isEqualTo(URI.create("https://s21:8080"));
 		then(this.props.getInstances().get("service2").get(0).isSecure()).isEqualTo(true);
 	}
 
@@ -83,8 +80,7 @@ public class SimpleDiscoveryClientPropertiesMappingTests {
 
 	@Test
 	public void testGetServices() {
-		then(this.discoveryClient.getServices()).containsExactlyInAnyOrder("service1",
-				"service2");
+		then(this.discoveryClient.getServices()).containsExactlyInAnyOrder("service1", "service2");
 	}
 
 	@Test
@@ -93,7 +89,7 @@ public class SimpleDiscoveryClientPropertiesMappingTests {
 		then(this.discoveryClient.getInstances("nonexistent")).isEmpty();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	public static class SampleConfig {
 

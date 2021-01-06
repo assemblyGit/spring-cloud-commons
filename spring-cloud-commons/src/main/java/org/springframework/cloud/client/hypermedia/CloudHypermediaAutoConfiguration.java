@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.hypermedia.CloudHypermediaAutoConfiguration.CloudHypermediaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.hateoas.Link;
 
 /**
  * Registers a default {@link RemoteResourceRefresher} if at least one
@@ -35,7 +37,8 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Oliver Gierke
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass(Link.class)
 @ConditionalOnBean(type = "org.springframework.cloud.client.hypermedia.RemoteResource")
 @EnableConfigurationProperties(CloudHypermediaProperties.class)
 public class CloudHypermediaAutoConfiguration {
@@ -49,8 +52,7 @@ public class CloudHypermediaAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public RemoteResourceRefresher discoveredResourceRefresher() {
-		return new RemoteResourceRefresher(this.discoveredResources,
-				this.properties.getRefresh().getFixedDelay(),
+		return new RemoteResourceRefresher(this.discoveredResources, this.properties.getRefresh().getFixedDelay(),
 				this.properties.getRefresh().getInitialDelay());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ public class RestartIntegrationTests {
 	@Test
 	public void testRestartTwice() throws Exception {
 
-		this.context = SpringApplication.run(TestConfiguration.class,
-				"--management.endpoint.restart.enabled=true", "--server.port=0",
-				"--spring.liveBeansView.mbeanDomain=livebeans");
+		this.context = SpringApplication.run(TestConfiguration.class, "--management.endpoint.restart.enabled=true",
+				"--server.port=0", "--spring.config.use-legacy-processing=true",
+				"--management.endpoints.web.exposure.include=restart", "--spring.liveBeansView.mbeanDomain=livebeans");
 
 		RestartEndpoint endpoint = this.context.getBean(RestartEndpoint.class);
 		then(this.context.getParent()).isNotNull();
@@ -59,7 +59,7 @@ public class RestartIntegrationTests {
 		then(this.context.getParent().getParent()).isNull();
 
 		RestartEndpoint next = this.context.getBean(RestartEndpoint.class);
-		then(next).isNotSameAs(endpoint);
+		then(next).isSameAs(endpoint);
 		this.context = next.doRestart();
 
 		then(this.context).isNotNull();
@@ -72,7 +72,7 @@ public class RestartIntegrationTests {
 		then(json).containsOnlyOnce("parent\": null");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	protected static class TestConfiguration {
 

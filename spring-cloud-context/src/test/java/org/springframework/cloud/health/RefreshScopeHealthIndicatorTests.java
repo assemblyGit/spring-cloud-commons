@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +39,11 @@ public class RefreshScopeHealthIndicatorTests {
 	@SuppressWarnings("unchecked")
 	private ObjectProvider<RefreshScope> scopeProvider = mock(ObjectProvider.class);
 
-	private ConfigurationPropertiesRebinder rebinder = mock(
-			ConfigurationPropertiesRebinder.class);
+	private ConfigurationPropertiesRebinder rebinder = mock(ConfigurationPropertiesRebinder.class);
 
 	private RefreshScope scope = mock(RefreshScope.class);
 
-	private RefreshScopeHealthIndicator indicator = new RefreshScopeHealthIndicator(
-			this.scopeProvider, this.rebinder);
+	private RefreshScopeHealthIndicator indicator = new RefreshScopeHealthIndicator(this.scopeProvider, this.rebinder);
 
 	@Before
 	public void init() {
@@ -61,24 +59,20 @@ public class RefreshScopeHealthIndicatorTests {
 
 	@Test
 	public void binderError() {
-		when(this.rebinder.getErrors())
-				.thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
+		when(this.rebinder.getErrors()).thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
 		then(this.indicator.health().getStatus()).isEqualTo(Status.DOWN);
 	}
 
 	@Test
 	public void scopeError() {
-		when(this.scope.getErrors())
-				.thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
+		when(this.scope.getErrors()).thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
 		then(this.indicator.health().getStatus()).isEqualTo(Status.DOWN);
 	}
 
 	@Test
 	public void bothError() {
-		when(this.rebinder.getErrors())
-				.thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
-		when(this.scope.getErrors())
-				.thenReturn(Collections.singletonMap("bar", new RuntimeException("BAR")));
+		when(this.rebinder.getErrors()).thenReturn(Collections.singletonMap("foo", new RuntimeException("FOO")));
+		when(this.scope.getErrors()).thenReturn(Collections.singletonMap("bar", new RuntimeException("BAR")));
 		then(this.indicator.health().getStatus()).isEqualTo(Status.DOWN);
 	}
 

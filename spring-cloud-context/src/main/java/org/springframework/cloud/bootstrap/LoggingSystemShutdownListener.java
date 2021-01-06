@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,7 @@ public class LoggingSystemShutdownListener
 	/**
 	 * Default order for the listener.
 	 */
-	public static final int DEFAULT_ORDER = BootstrapApplicationListener.DEFAULT_ORDER
-			+ 1;
+	public static final int DEFAULT_ORDER = BootstrapApplicationListener.DEFAULT_ORDER + 1;
 
 	private int order = DEFAULT_ORDER;
 
@@ -47,8 +46,8 @@ public class LoggingSystemShutdownListener
 	}
 
 	private void shutdownLogging() {
-		LoggingSystem loggingSystem = LoggingSystem
-				.get(ClassUtils.getDefaultClassLoader());
+		// TODO: only enable if bootstrap and legacy
+		LoggingSystem loggingSystem = LoggingSystem.get(ClassUtils.getDefaultClassLoader());
 		loggingSystem.cleanUp();
 		loggingSystem.beforeInitialize();
 	}

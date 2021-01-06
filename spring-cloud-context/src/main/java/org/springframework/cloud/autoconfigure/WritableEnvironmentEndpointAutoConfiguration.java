@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.autoconfigure;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.env.EnvironmentEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.env.EnvironmentEndpointProperties;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
@@ -42,29 +42,26 @@ import org.springframework.core.env.Environment;
  * @author Stephane Nicoll
  * @since 2.0.0
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ EnvironmentEndpoint.class, EnvironmentEndpointProperties.class })
 @ConditionalOnBean(EnvironmentManager.class)
 @AutoConfigureBefore(EnvironmentEndpointAutoConfiguration.class)
 @AutoConfigureAfter(LifecycleMvcEndpointAutoConfiguration.class)
 @EnableConfigurationProperties({ EnvironmentEndpointProperties.class })
-@ConditionalOnProperty(value = "management.endpoint.env.post.enabled",
-		matchIfMissing = true)
+@ConditionalOnProperty("management.endpoint.env.post.enabled")
 public class WritableEnvironmentEndpointAutoConfiguration {
 
 	private final EnvironmentEndpointProperties properties;
 
-	public WritableEnvironmentEndpointAutoConfiguration(
-			EnvironmentEndpointProperties properties) {
+	public WritableEnvironmentEndpointAutoConfiguration(EnvironmentEndpointProperties properties) {
 		this.properties = properties;
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnEnabledEndpoint
-	public WritableEnvironmentEndpoint environmentEndpoint(Environment environment) {
-		WritableEnvironmentEndpoint endpoint = new WritableEnvironmentEndpoint(
-				environment);
+	@ConditionalOnAvailableEndpoint
+	public WritableEnvironmentEndpoint writableEnvironmentEndpoint(Environment environment) {
+		WritableEnvironmentEndpoint endpoint = new WritableEnvironmentEndpoint(environment);
 		String[] keysToSanitize = this.properties.getKeysToSanitize();
 		if (keysToSanitize != null) {
 			endpoint.setKeysToSanitize(keysToSanitize);
@@ -73,8 +70,8 @@ public class WritableEnvironmentEndpointAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnEnabledEndpoint
-	public WritableEnvironmentEndpointWebExtension environmentEndpointWebExtension(
+	@ConditionalOnAvailableEndpoint
+	public WritableEnvironmentEndpointWebExtension writableEnvironmentEndpointWebExtension(
 			WritableEnvironmentEndpoint endpoint, EnvironmentManager environment) {
 		return new WritableEnvironmentEndpointWebExtension(endpoint, environment);
 	}

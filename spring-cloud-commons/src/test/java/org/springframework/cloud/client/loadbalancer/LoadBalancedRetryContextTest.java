@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,15 +53,13 @@ public class LoadBalancedRetryContextTest {
 
 	@Test
 	public void getRequest() throws Exception {
-		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context,
-				this.request);
+		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context, this.request);
 		then(lbContext.getRequest()).isEqualTo(this.request);
 	}
 
 	@Test
 	public void setRequest() throws Exception {
-		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context,
-				this.request);
+		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context, this.request);
 		HttpRequest newRequest = mock(HttpRequest.class);
 		lbContext.setRequest(newRequest);
 		then(lbContext.getRequest()).isEqualTo(newRequest);
@@ -69,8 +67,7 @@ public class LoadBalancedRetryContextTest {
 
 	@Test
 	public void getServiceInstance() throws Exception {
-		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context,
-				this.request);
+		LoadBalancedRetryContext lbContext = new LoadBalancedRetryContext(this.context, this.request);
 		ServiceInstance serviceInstance = mock(ServiceInstance.class);
 		lbContext.setServiceInstance(serviceInstance);
 		then(lbContext.getServiceInstance()).isEqualTo(serviceInstance);

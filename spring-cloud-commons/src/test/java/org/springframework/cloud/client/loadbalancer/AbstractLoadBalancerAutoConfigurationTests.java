@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.client.loadbalancer;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
@@ -29,25 +28,28 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactiveLoadBalancer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.springframework.cloud.client.loadbalancer.reactive.ReactiveLoadBalancer.REQUEST;
 
 /**
  * @author Ryan Baxter
  * @author Tim Ysewyn
+ * @author Olga Maciaszek-Sharma
  */
 public abstract class AbstractLoadBalancerAutoConfigurationTests {
 
 	@Test
 	public void restTemplateGetsLoadBalancerInterceptor() {
 		ConfigurableApplicationContext context = init(OneRestTemplate.class);
-		final Map<String, RestTemplate> restTemplates = context
-				.getBeansOfType(RestTemplate.class);
+		final Map<String, RestTemplate> restTemplates = context.getBeansOfType(RestTemplate.class);
 
 		then(restTemplates).isNotNull();
 		then(restTemplates.values()).hasSize(1);
@@ -62,8 +64,7 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 	@Test
 	public void multipleRestTemplates() {
 		ConfigurableApplicationContext context = init(TwoRestTemplates.class);
-		final Map<String, RestTemplate> restTemplates = context
-				.getBeansOfType(RestTemplate.class);
+		final Map<String, RestTemplate> restTemplates = context.getBeansOfType(RestTemplate.class);
 
 		then(restTemplates).isNotNull();
 		Collection<RestTemplate> templates = restTemplates.values();
@@ -79,12 +80,15 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 	}
 
 	protected ConfigurableApplicationContext init(Class<?> config) {
-		return new SpringApplicationBuilder().web(WebApplicationType.NONE)
-				.properties("spring.aop.proxyTargetClass=true")
+		return init(config, "spring.aop.proxyTargetClass=true");
+	}
+
+	protected ConfigurableApplicationContext init(Class<?> config, String... props) {
+		return new SpringApplicationBuilder().web(WebApplicationType.NONE).properties(props)
 				.sources(config, LoadBalancerAutoConfiguration.class).run();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class OneRestTemplate {
 
 		@LoadBalanced
@@ -98,9 +102,15 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 			return new NoopLoadBalancerClient();
 		}
 
+		@Bean
+		ReactiveLoadBalancer.Factory<ServiceInstance> loadBalancerFactory() {
+			return new TestLoadBalancerFactory();
+		}
+
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
+	@Import(OneRestTemplate.class)
 	protected static class TwoRestTemplates {
 
 		@Primary
@@ -109,18 +119,7 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 			return new RestTemplate();
 		}
 
-		@LoadBalanced
-		@Bean
-		RestTemplate loadBalancedRestTemplate() {
-			return new RestTemplate();
-		}
-
-		@Bean
-		LoadBalancerClient loadBalancerClient() {
-			return new NoopLoadBalancerClient();
-		}
-
-		@Configuration
+		@Configuration(proxyBeanMethods = false)
 		protected static class Two {
 
 			@Autowired
@@ -140,14 +139,18 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 
 		@Override
 		public ServiceInstance choose(String serviceId) {
-			return new DefaultServiceInstance(serviceId, serviceId, serviceId,
-					this.random.nextInt(40000), false);
+			return choose(serviceId, REQUEST);
+		}
+
+		@Override
+		public <T> ServiceInstance choose(String serviceId, Request<T> request) {
+			return new DefaultServiceInstance(serviceId, serviceId, serviceId, this.random.nextInt(40000), false);
 		}
 
 		@Override
 		public <T> T execute(String serviceId, LoadBalancerRequest<T> request) {
 			try {
-				return request.apply(choose(serviceId));
+				return request.apply(choose(serviceId, REQUEST));
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
@@ -155,10 +158,9 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 		}
 
 		@Override
-		public <T> T execute(String serviceId, ServiceInstance serviceInstance,
-				LoadBalancerRequest<T> request) throws IOException {
+		public <T> T execute(String serviceId, ServiceInstance serviceInstance, LoadBalancerRequest<T> request) {
 			try {
-				return request.apply(choose(serviceId));
+				return request.apply(choose(serviceId, REQUEST));
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
@@ -168,6 +170,25 @@ public abstract class AbstractLoadBalancerAutoConfigurationTests {
 		@Override
 		public URI reconstructURI(ServiceInstance instance, URI original) {
 			return DefaultServiceInstance.getUri(instance);
+		}
+
+	}
+
+	private static class TestLoadBalancerFactory implements ReactiveLoadBalancer.Factory<ServiceInstance> {
+
+		@Override
+		public ReactiveLoadBalancer<ServiceInstance> getInstance(String serviceId) {
+			throw new UnsupportedOperationException("Not implemented.");
+		}
+
+		@Override
+		public Object getInstance(String name, Class clazz, Class[] generics) {
+			throw new UnsupportedOperationException("Not implemented.");
+		}
+
+		@Override
+		public Map getInstances(String name, Class type) {
+			throw new UnsupportedOperationException("Not implemented.");
 		}
 
 	}

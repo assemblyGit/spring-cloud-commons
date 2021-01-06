@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ public class RefreshScopeSerializationTests {
 
 	@Test
 	public void defaultApplicationContextId() throws Exception {
-		ConfigurableApplicationContext context = new SpringApplicationBuilder(
-				TestConfiguration.class).web(WebApplicationType.NONE).run();
+		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfiguration.class)
+				.properties("spring.config.use-legacy-processing=true").web(WebApplicationType.NONE).run();
 		then(context.getId()).isEqualTo("application-1");
 	}
 
@@ -49,14 +49,13 @@ public class RefreshScopeSerializationTests {
 	}
 
 	private DefaultListableBeanFactory getBeanFactory() {
-		ConfigurableApplicationContext context = new SpringApplicationBuilder(
-				TestConfiguration.class).web(WebApplicationType.NONE).run();
-		DefaultListableBeanFactory factory = (DefaultListableBeanFactory) context
-				.getAutowireCapableBeanFactory();
+		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfiguration.class)
+				.web(WebApplicationType.NONE).run();
+		DefaultListableBeanFactory factory = (DefaultListableBeanFactory) context.getAutowireCapableBeanFactory();
 		return factory;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration {
 
 		@Bean

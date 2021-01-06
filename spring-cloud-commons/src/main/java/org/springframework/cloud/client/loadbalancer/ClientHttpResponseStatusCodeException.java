@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@ public class ClientHttpResponseStatusCodeException extends RetryableStatusCodeEx
 	 * @throws IOException Thrown if the {@link ClientHttpResponse} response code cannot
 	 * be retrieved.
 	 */
-	public ClientHttpResponseStatusCodeException(String serviceId,
-			ClientHttpResponse response, byte[] body) throws IOException {
+	public ClientHttpResponseStatusCodeException(String serviceId, ClientHttpResponse response, byte[] body)
+			throws IOException {
 		super(serviceId, response.getRawStatusCode(), response, null);
 		this.response = new ClientHttpResponseWrapper(response, body);
 	}

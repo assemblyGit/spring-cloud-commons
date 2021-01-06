@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,7 @@ public class DefaultOkHttpClientFactory implements OkHttpClientFactory {
 				SSLContext sslContext = SSLContext.getInstance("SSL");
 				sslContext.init(null, trustManagers, new java.security.SecureRandom());
 				SSLSocketFactory disabledSSLSocketFactory = sslContext.getSocketFactory();
-				this.builder.sslSocketFactory(disabledSSLSocketFactory,
-						disabledTrustManager);
+				this.builder.sslSocketFactory(disabledSSLSocketFactory, disabledTrustManager);
 				this.builder.hostnameVerifier(new TrustAllHostnames());
 			}
 			catch (NoSuchAlgorithmException e) {

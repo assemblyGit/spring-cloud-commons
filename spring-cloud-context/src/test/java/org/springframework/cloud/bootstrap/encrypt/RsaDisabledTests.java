@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,8 @@ public class RsaDisabledTests {
 	@Before
 	public void setUp() {
 		this.context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
-				.sources(EncryptionBootstrapConfiguration.class)
-				.web(WebApplicationType.NONE).properties("encrypt.key:mykey",
-						"encrypt.rsa.strong:true", "encrypt.rsa.salt:foobar")
-				.run();
+				.sources(EncryptionBootstrapConfiguration.class).web(WebApplicationType.NONE)
+				.properties("encrypt.key:mykey", "encrypt.rsa.strong:true", "encrypt.rsa.salt:foobar").run();
 	}
 
 	@After
@@ -58,8 +56,7 @@ public class RsaDisabledTests {
 
 	@Test
 	public void testLoadBalancedRetryFactoryBean() throws Exception {
-		Map<String, RsaProperties> properties = this.context
-				.getBeansOfType(RsaProperties.class);
+		Map<String, RsaProperties> properties = this.context.getBeansOfType(RsaProperties.class);
 		then(properties.values()).hasSize(0);
 	}
 

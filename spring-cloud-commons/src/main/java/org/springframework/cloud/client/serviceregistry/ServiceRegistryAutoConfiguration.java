@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.springframework.cloud.client.serviceregistry;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class ServiceRegistryAutoConfiguration {
 
 	@ConditionalOnBean(ServiceRegistry.class)
@@ -39,11 +39,9 @@ public class ServiceRegistryAutoConfiguration {
 		private Registration registration;
 
 		@Bean
-		@ConditionalOnEnabledEndpoint
-		public ServiceRegistryEndpoint serviceRegistryEndpoint(
-				ServiceRegistry serviceRegistry) {
-			ServiceRegistryEndpoint endpoint = new ServiceRegistryEndpoint(
-					serviceRegistry);
+		@ConditionalOnAvailableEndpoint
+		public ServiceRegistryEndpoint serviceRegistryEndpoint(ServiceRegistry serviceRegistry) {
+			ServiceRegistryEndpoint endpoint = new ServiceRegistryEndpoint(serviceRegistry);
 			endpoint.setRegistration(this.registration);
 			return endpoint;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,11 +41,9 @@ import org.springframework.core.env.Environment;
  * @author Olga Maciaszek-Sharma
  *
  */
-public class LoggingRebinder
-		implements ApplicationListener<EnvironmentChangeEvent>, EnvironmentAware {
+public class LoggingRebinder implements ApplicationListener<EnvironmentChangeEvent>, EnvironmentAware {
 
-	private static final Bindable<Map<String, String>> STRING_STRING_MAP = Bindable
-			.mapOf(String.class, String.class);
+	private static final Bindable<Map<String, String>> STRING_STRING_MAP = Bindable.mapOf(String.class, String.class);
 
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -66,16 +64,14 @@ public class LoggingRebinder
 	}
 
 	protected void setLogLevels(LoggingSystem system, Environment environment) {
-		Map<String, String> levels = Binder.get(environment)
-				.bind("logging.level", STRING_STRING_MAP)
+		Map<String, String> levels = Binder.get(environment).bind("logging.level", STRING_STRING_MAP)
 				.orElseGet(Collections::emptyMap);
 		for (Entry<String, String> entry : levels.entrySet()) {
 			setLogLevel(system, environment, entry.getKey(), entry.getValue().toString());
 		}
 	}
 
-	private void setLogLevel(LoggingSystem system, Environment environment, String name,
-			String level) {
+	private void setLogLevel(LoggingSystem system, Environment environment, String name, String level) {
 		try {
 			if (name.equalsIgnoreCase("root")) {
 				name = null;

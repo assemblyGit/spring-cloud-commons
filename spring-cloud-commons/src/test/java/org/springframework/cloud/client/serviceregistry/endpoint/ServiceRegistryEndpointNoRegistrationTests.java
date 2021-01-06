@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ServiceRegistryEndpointNoRegistrationTests.TestConfiguration.class)
+@SpringBootTest(classes = ServiceRegistryEndpointNoRegistrationTests.TestConfiguration.class)
 @AutoConfigureMockMvc
 public class ServiceRegistryEndpointNoRegistrationTests {
 
@@ -52,8 +51,7 @@ public class ServiceRegistryEndpointNoRegistrationTests {
 
 	@Test
 	public void testGet() throws Exception {
-		this.mvc.perform(get("/service-registry/instance-status"))
-				.andExpect(status().isNotFound());
+		this.mvc.perform(get("/service-registry/instance-status")).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -62,12 +60,11 @@ public class ServiceRegistryEndpointNoRegistrationTests {
 				.andExpect(status().isNotFound());
 	}
 
-	@Import({ JacksonAutoConfiguration.class,
-			HttpMessageConvertersAutoConfiguration.class, EndpointAutoConfiguration.class,
-			WebMvcAutoConfiguration.class
+	@Import({ JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
+			EndpointAutoConfiguration.class, WebMvcAutoConfiguration.class
 			// ManagementServerPropertiesAutoConfiguration.class
 	})
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class TestConfiguration {
 
 		@Bean

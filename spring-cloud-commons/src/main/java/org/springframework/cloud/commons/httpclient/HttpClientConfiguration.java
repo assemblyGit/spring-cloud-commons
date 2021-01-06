@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,11 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Ryan Baxter
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class HttpClientConfiguration {
 
-	@Configuration
-	@ConditionalOnProperty(name = "spring.cloud.httpclientfactories.apache.enabled",
-			matchIfMissing = true)
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnProperty(name = "spring.cloud.httpclientfactories.apache.enabled", matchIfMissing = true)
 	@ConditionalOnClass(HttpClient.class)
 	static class ApacheHttpClientConfiguration {
 
@@ -52,16 +51,14 @@ public class HttpClientConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ApacheHttpClientFactory apacheHttpClientFactory(
-				HttpClientBuilder builder) {
+		public ApacheHttpClientFactory apacheHttpClientFactory(HttpClientBuilder builder) {
 			return new DefaultApacheHttpClientFactory(builder);
 		}
 
 	}
 
-	@Configuration
-	@ConditionalOnProperty(name = "spring.cloud.httpclientfactories.ok.enabled",
-			matchIfMissing = true)
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnProperty(name = "spring.cloud.httpclientfactories.ok.enabled", matchIfMissing = true)
 	@ConditionalOnClass(OkHttpClient.class)
 	static class OkHttpClientConfiguration {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,30 +30,25 @@ public class HasFeatures {
 
 	private final List<NamedFeature> namedFeatures = new ArrayList<>();
 
-	public HasFeatures(List<Class<?>> abstractFeatures,
-			List<NamedFeature> namedFeatures) {
+	public HasFeatures(List<Class<?>> abstractFeatures, List<NamedFeature> namedFeatures) {
 		this.abstractFeatures.addAll(abstractFeatures);
 		this.namedFeatures.addAll(namedFeatures);
 	}
 
 	public static HasFeatures abstractFeatures(Class<?>... abstractFeatures) {
-		return new HasFeatures(Arrays.asList(abstractFeatures),
-				Collections.<NamedFeature>emptyList());
+		return new HasFeatures(Arrays.asList(abstractFeatures), Collections.<NamedFeature>emptyList());
 	}
 
 	public static HasFeatures namedFeatures(NamedFeature... namedFeatures) {
-		return new HasFeatures(Collections.<Class<?>>emptyList(),
-				Arrays.asList(namedFeatures));
+		return new HasFeatures(Collections.<Class<?>>emptyList(), Arrays.asList(namedFeatures));
 	}
 
 	public static HasFeatures namedFeature(String name, Class<?> type) {
 		return namedFeatures(new NamedFeature(name, type));
 	}
 
-	public static HasFeatures namedFeatures(String name1, Class<?> type1, String name2,
-			Class<?> type2) {
-		return namedFeatures(new NamedFeature(name1, type1),
-				new NamedFeature(name2, type2));
+	public static HasFeatures namedFeatures(String name1, Class<?> type1, String name2, Class<?> type2) {
+		return namedFeatures(new NamedFeature(name1, type1), new NamedFeature(name2, type2));
 	}
 
 	public List<Class<?>> getAbstractFeatures() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author Ryan Baxter
  */
-public class RetryLoadBalancerAutoConfigurationTests
-		extends AbstractLoadBalancerAutoConfigurationTests {
+public class RetryLoadBalancerAutoConfigurationTests extends AbstractLoadBalancerAutoConfigurationTests {
 
 	@Override
 	protected void assertLoadBalanced(RestTemplate restTemplate) {
@@ -42,13 +41,21 @@ public class RetryLoadBalancerAutoConfigurationTests
 	}
 
 	@Test
-	public void testDefaultBackOffPolicy() throws Exception {
+	public void testRetryDisabled() {
+		ConfigurableApplicationContext context = init(OneRestTemplate.class, "spring.aop.proxyTargetClass=true",
+				"spring.cloud.loadbalancer.retry.enabled=false");
+		List<ClientHttpRequestInterceptor> interceptors = context.getBean(RestTemplate.class).getInterceptors();
+		then(interceptors).hasSize(1);
+		ClientHttpRequestInterceptor interceptor = interceptors.get(0);
+		then(interceptor).isInstanceOf(LoadBalancerInterceptor.class);
+	}
+
+	@Test
+	public void testDefaultBackOffPolicy() {
 		ConfigurableApplicationContext context = init(OneRestTemplate.class);
-		LoadBalancedRetryFactory loadBalancedRetryFactory = context
-				.getBean(LoadBalancedRetryFactory.class);
+		LoadBalancedRetryFactory loadBalancedRetryFactory = context.getBean(LoadBalancedRetryFactory.class);
 		then(loadBalancedRetryFactory).isInstanceOf(LoadBalancedRetryFactory.class);
-		then(loadBalancedRetryFactory.createBackOffPolicy("foo"))
-				.isInstanceOf(NoBackOffPolicy.class);
+		then(loadBalancedRetryFactory.createBackOffPolicy("foo")).isInstanceOf(NoBackOffPolicy.class);
 	}
 
 }

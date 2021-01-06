@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ public class EncryptorFactoryTests {
 
 	@Test
 	public void testWithRsaPrivateKey() throws Exception {
-		String key = StreamUtils.copyToString(
-				new ClassPathResource("/example-test-rsa-private-key").getInputStream(),
+		String key = StreamUtils.copyToString(new ClassPathResource("/example-test-rsa-private-key").getInputStream(),
 				Charset.forName("ASCII"));
 
 		TextEncryptor encryptor = new EncryptorFactory().create(key);

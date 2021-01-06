@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,25 +32,21 @@ import org.springframework.context.annotation.Configuration;
  * @author Marcin Grzejszczak
  * @since 1.3.6
  */
-@Configuration
-@ConditionalOnProperty(value = "spring.cloud.compatibility-verifier.enabled",
-		matchIfMissing = true)
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(value = "spring.cloud.compatibility-verifier.enabled", matchIfMissing = true)
 @AutoConfigureOrder(0)
 @EnableConfigurationProperties(CompatibilityVerifierProperties.class)
 public class CompatibilityVerifierAutoConfiguration {
 
 	@Bean
-	CompositeCompatibilityVerifier compositeCompatibilityVerifier(
-			List<CompatibilityVerifier> verifiers) {
-		CompositeCompatibilityVerifier verifier = new CompositeCompatibilityVerifier(
-				verifiers);
+	CompositeCompatibilityVerifier compositeCompatibilityVerifier(List<CompatibilityVerifier> verifiers) {
+		CompositeCompatibilityVerifier verifier = new CompositeCompatibilityVerifier(verifiers);
 		verifier.verifyDependencies();
 		return verifier;
 	}
 
 	@Bean
-	SpringBootVersionVerifier springBootVersionVerifier(
-			CompatibilityVerifierProperties properties) {
+	SpringBootVersionVerifier springBootVersionVerifier(CompatibilityVerifierProperties properties) {
 		return new SpringBootVersionVerifier(properties.getCompatibleBootVersions());
 	}
 

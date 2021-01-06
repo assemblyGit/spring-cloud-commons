@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,7 @@ public class EnvironmentManager implements ApplicationEventPublisherAware {
 		MutablePropertySources sources = environment.getPropertySources();
 		if (sources.contains(MANAGER_PROPERTY_SOURCE)) {
 			@SuppressWarnings("unchecked")
-			Map<String, Object> map = (Map<String, Object>) sources
-					.get(MANAGER_PROPERTY_SOURCE).getSource();
+			Map<String, Object> map = (Map<String, Object>) sources.get(MANAGER_PROPERTY_SOURCE).getSource();
 			this.map = map;
 		}
 	}
@@ -81,10 +80,8 @@ public class EnvironmentManager implements ApplicationEventPublisherAware {
 
 		if (!this.environment.getPropertySources().contains(MANAGER_PROPERTY_SOURCE)) {
 			synchronized (this.map) {
-				if (!this.environment.getPropertySources()
-						.contains(MANAGER_PROPERTY_SOURCE)) {
-					MapPropertySource source = new MapPropertySource(
-							MANAGER_PROPERTY_SOURCE, this.map);
+				if (!this.environment.getPropertySources().contains(MANAGER_PROPERTY_SOURCE)) {
+					MapPropertySource source = new MapPropertySource(MANAGER_PROPERTY_SOURCE, this.map);
 					this.environment.getPropertySources().addFirst(source);
 				}
 			}
@@ -92,8 +89,7 @@ public class EnvironmentManager implements ApplicationEventPublisherAware {
 
 		if (!value.equals(this.environment.getProperty(name))) {
 			this.map.put(name, value);
-			publish(new EnvironmentChangeEvent(this.publisher,
-					Collections.singleton(name)));
+			publish(new EnvironmentChangeEvent(this.publisher, Collections.singleton(name)));
 		}
 
 	}

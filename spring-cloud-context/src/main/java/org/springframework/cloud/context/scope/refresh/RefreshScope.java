@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  *
  * <p>
  * Note that all beans in this scope are <em>only</em> initialized when first accessed, so
- * the scope forces lazy initialization semantics. The implementation involves creating a
- * proxy for every bean in the scope, so there is a flag
- * {@link #setProxyTargetClass(boolean) proxyTargetClass} which controls the proxy
- * creation, defaulting to JDK dynamic proxies and therefore only exposing the interfaces
- * implemented by a bean. If callers need access to other methods, then the flag needs to
- * be set (and CGLib must be present on the classpath). Because this scope automatically
- * proxies all its beans, there is no need to add <code>&lt;aop:auto-proxy/&gt;</code> to
- * any bean definitions.
+ * the scope forces lazy initialization semantics.
  * </p>
  *
  * <p>
@@ -71,8 +64,8 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  *
  */
 @ManagedResource
-public class RefreshScope extends GenericScope implements ApplicationContextAware,
-		ApplicationListener<ContextRefreshedEvent>, Ordered {
+public class RefreshScope extends GenericScope
+		implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, Ordered {
 
 	private ApplicationContext context;
 
@@ -108,8 +101,7 @@ public class RefreshScope extends GenericScope implements ApplicationContextAwar
 	}
 
 	@Override
-	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
-			throws BeansException {
+	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		this.registry = registry;
 		super.postProcessBeanDefinitionRegistry(registry);
 	}
@@ -120,8 +112,7 @@ public class RefreshScope extends GenericScope implements ApplicationContextAwar
 	}
 
 	public void start(ContextRefreshedEvent event) {
-		if (event.getApplicationContext() == this.context && this.eager
-				&& this.registry != null) {
+		if (event.getApplicationContext() == this.context && this.eager && this.registry != null) {
 			eagerlyInitialize();
 		}
 	}
@@ -129,8 +120,7 @@ public class RefreshScope extends GenericScope implements ApplicationContextAwar
 	private void eagerlyInitialize() {
 		for (String name : this.context.getBeanDefinitionNames()) {
 			BeanDefinition definition = this.registry.getBeanDefinition(name);
-			if (this.getName().equals(definition.getScope())
-					&& !definition.isLazyInit()) {
+			if (this.getName().equals(definition.getScope()) && !definition.isLazyInit()) {
 				Object bean = this.context.getBean(name);
 				if (bean != null) {
 					bean.getClass();

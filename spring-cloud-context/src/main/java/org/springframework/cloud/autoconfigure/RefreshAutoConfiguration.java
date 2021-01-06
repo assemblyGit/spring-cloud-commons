@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.autoconfigure;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,10 +38,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.cloud.context.refresh.ConfigDataContextRefresher;
 import org.springframework.cloud.context.refresh.ContextRefresher;
+import org.springframework.cloud.context.refresh.LegacyContextRefresher;
 import org.springframework.cloud.context.scope.refresh.RefreshScope;
 import org.springframework.cloud.endpoint.event.RefreshEventListener;
 import org.springframework.cloud.logging.LoggingRebinder;
+import org.springframework.cloud.util.ConditionalOnBootstrapDisabled;
+import org.springframework.cloud.util.ConditionalOnBootstrapEnabled;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -61,10 +64,9 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Venil Noronha
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(RefreshScope.class)
-@ConditionalOnProperty(name = RefreshAutoConfiguration.REFRESH_SCOPE_ENABLED,
-		matchIfMissing = true)
+@ConditionalOnProperty(name = RefreshAutoConfiguration.REFRESH_SCOPE_ENABLED, matchIfMissing = true)
 @AutoConfigureBefore(HibernateJpaAutoConfiguration.class)
 public class RefreshAutoConfiguration {
 
@@ -97,9 +99,17 @@ public class RefreshAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ContextRefresher contextRefresher(ConfigurableApplicationContext context,
+	@ConditionalOnBootstrapEnabled
+	public LegacyContextRefresher legacyContextRefresher(ConfigurableApplicationContext context, RefreshScope scope) {
+		return new LegacyContextRefresher(context, scope);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnBootstrapDisabled
+	public ConfigDataContextRefresher configDataContextRefresher(ConfigurableApplicationContext context,
 			RefreshScope scope) {
-		return new ContextRefresher(context, scope);
+		return new ConfigDataContextRefresher(context, scope);
 	}
 
 	@Bean
@@ -107,7 +117,7 @@ public class RefreshAutoConfiguration {
 		return new RefreshEventListener(contextRefresher);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(name = "javax.persistence.EntityManagerFactory")
 	protected static class JpaInvokerConfiguration implements LoadTimeWeaverAware {
 
@@ -140,8 +150,7 @@ public class RefreshAutoConfiguration {
 		 * Class names for beans to post process into refresh scope. Useful when you don't
 		 * control the bean definition (e.g. it came from auto-configuration).
 		 */
-		private Set<String> refreshables = new HashSet<>(
-				Arrays.asList("com.zaxxer.hikari.HikariDataSource"));
+		private Set<String> refreshables = new HashSet<>();
 
 		public Set<String> getRefreshable() {
 			return this.refreshables;
@@ -159,33 +168,27 @@ public class RefreshAutoConfiguration {
 		}
 
 		@Override
-		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
-				throws BeansException {
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		}
 
 		@Override
-		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
-				throws BeansException {
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 			bindEnvironmentIfNeeded(registry);
 			for (String name : registry.getBeanDefinitionNames()) {
 				BeanDefinition definition = registry.getBeanDefinition(name);
 				if (isApplicable(registry, name, definition)) {
-					BeanDefinitionHolder holder = new BeanDefinitionHolder(definition,
-							name);
-					BeanDefinitionHolder proxy = ScopedProxyUtils
-							.createScopedProxy(holder, registry, true);
+					BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, name);
+					BeanDefinitionHolder proxy = ScopedProxyUtils.createScopedProxy(holder, registry, true);
 					definition.setScope("refresh");
 					if (registry.containsBeanDefinition(proxy.getBeanName())) {
 						registry.removeBeanDefinition(proxy.getBeanName());
 					}
-					registry.registerBeanDefinition(proxy.getBeanName(),
-							proxy.getBeanDefinition());
+					registry.registerBeanDefinition(proxy.getBeanName(), proxy.getBeanDefinition());
 				}
 			}
 		}
 
-		private boolean isApplicable(BeanDefinitionRegistry registry, String name,
-				BeanDefinition definition) {
+		private boolean isApplicable(BeanDefinitionRegistry registry, String name, BeanDefinition definition) {
 			String scope = definition.getScope();
 			if (REFRESH_SCOPE_NAME.equals(scope)) {
 				// Already refresh scoped
@@ -209,8 +212,7 @@ public class RefreshAutoConfiguration {
 				if (this.environment == null) {
 					this.environment = new StandardEnvironment();
 				}
-				Binder.get(this.environment).bind("spring.cloud.refresh",
-						Bindable.ofInstance(this));
+				Binder.get(this.environment).bind("spring.cloud.refresh", Bindable.ofInstance(this));
 				this.bound = true;
 			}
 		}

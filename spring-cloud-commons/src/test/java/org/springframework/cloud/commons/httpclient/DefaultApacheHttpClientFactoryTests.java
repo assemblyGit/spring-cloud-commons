@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,11 @@ public class DefaultApacheHttpClientFactoryTests {
 
 	@Test
 	public void createClient() throws Exception {
-		final RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(100)
-				.setConnectTimeout(200).setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
-		CloseableHttpClient httpClient = new DefaultApacheHttpClientFactory(
-				HttpClientBuilder.create()).createBuilder()
-						.setConnectionManager(mock(HttpClientConnectionManager.class))
-						.setDefaultRequestConfig(requestConfig).build();
+		final RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(100).setConnectTimeout(200)
+				.setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
+		CloseableHttpClient httpClient = new DefaultApacheHttpClientFactory(HttpClientBuilder.create()).createBuilder()
+				.setConnectionManager(mock(HttpClientConnectionManager.class)).setDefaultRequestConfig(requestConfig)
+				.build();
 		BDDAssertions.then(httpClient).isInstanceOf(Configurable.class);
 		RequestConfig config = ((Configurable) httpClient).getConfig();
 		then(config.getSocketTimeout()).isEqualTo(100);

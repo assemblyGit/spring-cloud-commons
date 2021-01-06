@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfiguration.class,
-		properties = { "spring.datasource.hikari.read-only=false" })
+		properties = { "spring.datasource.hikari.read-only=false", "spring.config.use-legacy-processing=true" })
 public class ContextRefresherIntegrationTests {
 
 	@Autowired
@@ -74,14 +74,24 @@ public class ContextRefresherIntegrationTests {
 	@DirtiesContext
 	public void testUpdateHikari() throws Exception {
 		then(this.properties.getMessage()).isEqualTo("Hello scope!");
-		TestPropertyValues.of("spring.datasource.hikari.read-only=true")
-				.applyTo(this.environment);
+		TestPropertyValues.of("spring.datasource.hikari.read-only=true").applyTo(this.environment);
 		// ...and then refresh, so the bean is re-initialized:
 		this.refresher.refresh();
 		then(this.properties.getMessage()).isEqualTo("Hello scope!");
 	}
 
-	@Configuration
+	@Test
+	@DirtiesContext
+	public void testCachedRandom() {
+		long cachedRandomLong = properties.getCachedRandomLong();
+		long randomLong = properties.randomLong();
+		then(cachedRandomLong).isNotNull();
+		this.refresher.refresh();
+		then(randomLong).isNotEqualTo(properties.randomLong());
+		then(cachedRandomLong).isEqualTo(properties.cachedRandomLong);
+	}
+
+	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties(TestProperties.class)
 	@EnableAutoConfiguration
 	protected static class TestConfiguration {
@@ -95,6 +105,10 @@ public class ContextRefresherIntegrationTests {
 		private String message;
 
 		private int delay;
+
+		private Long cachedRandomLong;
+
+		private Long randomLong;
 
 		@ManagedAttribute
 		public String getMessage() {
@@ -112,6 +126,22 @@ public class ContextRefresherIntegrationTests {
 
 		public void setDelay(int delay) {
 			this.delay = delay;
+		}
+
+		public long getCachedRandomLong() {
+			return cachedRandomLong;
+		}
+
+		public void setCachedRandomLong(long cachedRandomLong) {
+			this.cachedRandomLong = cachedRandomLong;
+		}
+
+		public long randomLong() {
+			return randomLong;
+		}
+
+		public void setRandomLong(long randomLong) {
+			this.randomLong = randomLong;
 		}
 
 	}

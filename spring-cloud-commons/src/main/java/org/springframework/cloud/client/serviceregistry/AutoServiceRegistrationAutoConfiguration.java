@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Import(AutoServiceRegistrationConfiguration.class)
-@ConditionalOnProperty(value = "spring.cloud.service-registry.auto-registration.enabled",
-		matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.service-registry.auto-registration.enabled", matchIfMissing = true)
 public class AutoServiceRegistrationAutoConfiguration {
 
 	@Autowired(required = false)
@@ -41,8 +40,8 @@ public class AutoServiceRegistrationAutoConfiguration {
 	@PostConstruct
 	protected void init() {
 		if (this.autoServiceRegistration == null && this.properties.isFailFast()) {
-			throw new IllegalStateException("Auto Service Registration has "
-					+ "been requested, but there is no AutoServiceRegistration bean");
+			throw new IllegalStateException(
+					"Auto Service Registration has " + "been requested, but there is no AutoServiceRegistration bean");
 		}
 	}
 

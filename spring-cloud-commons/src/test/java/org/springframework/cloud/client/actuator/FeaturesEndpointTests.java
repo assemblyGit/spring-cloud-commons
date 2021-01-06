@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ public class FeaturesEndpointTests {
 	@Before
 	public void setup() {
 		this.context = new AnnotationConfigApplicationContext();
-		this.context.register(JacksonAutoConfiguration.class, FeaturesConfig.class,
-				Config.class);
+		this.context.register(JacksonAutoConfiguration.class, FeaturesConfig.class, Config.class);
 		this.context.refresh();
 	}
 
@@ -56,8 +55,7 @@ public class FeaturesEndpointTests {
 
 	@Test
 	public void invokeWorks() {
-		FeaturesEndpoint.Features features = this.context.getBean(FeaturesEndpoint.class)
-				.features();
+		FeaturesEndpoint.Features features = this.context.getBean(FeaturesEndpoint.class).features();
 		then(features).isNotNull();
 		then(features.getEnabled()).hasSize(2).contains(newFeature("foo", Foo.class),
 				newFeature("Baz Feature", Baz.class));
@@ -68,7 +66,7 @@ public class FeaturesEndpointTests {
 		return new FeaturesEndpoint.Feature(name, type.getCanonicalName(), null, null);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class FeaturesConfig {
 
 		@Bean
@@ -78,8 +76,7 @@ public class FeaturesEndpointTests {
 
 		@Bean
 		HasFeatures localFeatures() {
-			HasFeatures features = HasFeatures.namedFeatures(
-					new NamedFeature("foo", Foo.class),
+			HasFeatures features = HasFeatures.namedFeatures(new NamedFeature("foo", Foo.class),
 					new NamedFeature("Baz Feature", Baz.class));
 			features.getAbstractFeatures().add(Bar.class);
 			return features;
@@ -87,7 +84,7 @@ public class FeaturesEndpointTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
 	public static class Config {
 

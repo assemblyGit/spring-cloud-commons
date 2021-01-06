@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,16 +28,14 @@ public class SpringFactoryImportSelectorTests {
 	@Test
 	public void testFindAnnotation() {
 		MyAnnotationImportSelector selector = new MyAnnotationImportSelector();
-		then(selector.getAnnotationClass()).as("annotationClass was wrong")
-				.isEqualTo(MyAnnotation.class);
+		then(selector.getAnnotationClass()).as("annotationClass was wrong").isEqualTo(MyAnnotation.class);
 	}
 
 	public @interface MyAnnotation {
 
 	}
 
-	public static class MyAnnotationImportSelector
-			extends SpringFactoryImportSelector<MyAnnotation> {
+	public static class MyAnnotationImportSelector extends SpringFactoryImportSelector<MyAnnotation> {
 
 		@Override
 		protected boolean isEnabled() {

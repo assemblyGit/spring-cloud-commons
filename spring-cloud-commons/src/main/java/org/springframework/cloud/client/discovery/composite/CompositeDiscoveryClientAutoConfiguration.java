@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,14 +31,13 @@ import org.springframework.context.annotation.Primary;
  * @author Biju Kunjummen
  */
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(SimpleDiscoveryClientAutoConfiguration.class)
 public class CompositeDiscoveryClientAutoConfiguration {
 
 	@Bean
 	@Primary
-	public CompositeDiscoveryClient compositeDiscoveryClient(
-			List<DiscoveryClient> discoveryClients) {
+	public CompositeDiscoveryClient compositeDiscoveryClient(List<DiscoveryClient> discoveryClients) {
 		return new CompositeDiscoveryClient(discoveryClients);
 	}
 

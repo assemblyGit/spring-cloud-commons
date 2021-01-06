@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ public final class IdUtils {
 
 	private static final String SEPARATOR = ":";
 
+	// @checkstyle:off
+	public static final String DEFAULT_SERVICE_ID_STRING = "${vcap.application.name:${spring.application.name:application}}:${vcap.application.instance_index:${spring.application.index:${local.server.port:${server.port:0}}}}:${vcap.application.instance_id:${cachedrandom.${vcap.application.name:${spring.application.name:application}}.value}}";
+
+	// @checkstyle:on
+
 	private IdUtils() {
 		throw new IllegalStateException("Can't instantiate a utility class");
 	}
@@ -34,8 +39,7 @@ public final class IdUtils {
 		return getDefaultInstanceId(resolver, true);
 	}
 
-	public static String getDefaultInstanceId(PropertyResolver resolver,
-			boolean includeHostname) {
+	public static String getDefaultInstanceId(PropertyResolver resolver, boolean includeHostname) {
 		String vcapInstanceId = resolver.getProperty("vcap.application.instance_id");
 		if (StringUtils.hasText(vcapInstanceId)) {
 			return vcapInstanceId;
@@ -49,14 +53,29 @@ public final class IdUtils {
 
 		String namePart = combineParts(hostname, SEPARATOR, appName);
 
-		String indexPart = resolver.getProperty("spring.application.instance_id",
-				resolver.getProperty("server.port"));
+		String indexPart = resolver.getProperty("spring.application.instance_id", resolver.getProperty("server.port"));
 
 		return combineParts(namePart, SEPARATOR, indexPart);
 	}
 
-	public static String combineParts(String firstPart, String separator,
-			String secondPart) {
+	/**
+	 * Gets the resolved service id.
+	 * @param resolver A property resolved
+	 * @return A unique id that can be used to uniquely identify a service
+	 */
+	public static String getResolvedServiceId(PropertyResolver resolver) {
+		return resolver.resolvePlaceholders(getUnresolvedServiceId());
+	}
+
+	/**
+	 * Gets an the unresolved service id.
+	 * @return The combination of properties to create a unique service id
+	 */
+	public static String getUnresolvedServiceId() {
+		return DEFAULT_SERVICE_ID_STRING;
+	}
+
+	public static String combineParts(String firstPart, String separator, String secondPart) {
 		String combined = null;
 		if (firstPart != null && secondPart != null) {
 			combined = firstPart + separator + secondPart;

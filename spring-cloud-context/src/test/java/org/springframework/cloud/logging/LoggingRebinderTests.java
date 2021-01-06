@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,14 @@ public class LoggingRebinderTests {
 
 	@After
 	public void reset() {
-		LoggingSystem.get(getClass().getClassLoader())
-				.setLogLevel("org.springframework.web", LogLevel.INFO);
+		LoggingSystem.get(getClass().getClassLoader()).setLogLevel("org.springframework.web", LogLevel.INFO);
 	}
 
 	@Test
 	public void logLevelsChanged() {
 		then(this.logger.isTraceEnabled()).isFalse();
 		StandardEnvironment environment = new StandardEnvironment();
-		TestPropertyValues.of("logging.level.org.springframework.web=TRACE")
-				.applyTo(environment);
+		TestPropertyValues.of("logging.level.org.springframework.web=TRACE").applyTo(environment);
 		this.rebinder.setEnvironment(environment);
 		this.rebinder.onApplicationEvent(new EnvironmentChangeEvent(environment,
 				Collections.singleton("logging.level.org.springframework.web")));
@@ -65,8 +63,7 @@ public class LoggingRebinderTests {
 	public void logLevelsLowerCase() {
 		then(this.logger.isTraceEnabled()).isFalse();
 		StandardEnvironment environment = new StandardEnvironment();
-		TestPropertyValues.of("logging.level.org.springframework.web=trace")
-				.applyTo(environment);
+		TestPropertyValues.of("logging.level.org.springframework.web=trace").applyTo(environment);
 		this.rebinder.setEnvironment(environment);
 		this.rebinder.onApplicationEvent(new EnvironmentChangeEvent(environment,
 				Collections.singleton("logging.level.org.springframework.web")));
@@ -78,8 +75,7 @@ public class LoggingRebinderTests {
 		ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory
 				.getLogger("org.springframework.cloud");
 		StandardEnvironment environment = new StandardEnvironment();
-		TestPropertyValues.of("logging.level.org.springframework.cloud=false")
-				.applyTo(environment);
+		TestPropertyValues.of("logging.level.org.springframework.cloud=false").applyTo(environment);
 		rebinder.setEnvironment(environment);
 		rebinder.onApplicationEvent(new EnvironmentChangeEvent(environment,
 				Collections.singleton("logging.level.org.springframework.cloud")));

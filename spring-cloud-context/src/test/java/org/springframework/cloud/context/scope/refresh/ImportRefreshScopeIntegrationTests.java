@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,11 @@ public class ImportRefreshScopeIntegrationTests {
 	@Test
 	public void testSimpleProperties() throws Exception {
 		then(this.service.getMessage()).isEqualTo("Hello scope!");
-		then(this.beanFactory.getBeanDefinition("scopedTarget.service").getScope())
-				.isEqualTo("refresh");
+		then(this.beanFactory.getBeanDefinition("scopedTarget.service").getScope()).isEqualTo("refresh");
 		then(this.service.getMessage()).isEqualTo("Hello scope!");
 	}
 
-	@Configuration("service")
+	@Configuration(value = "service", proxyBeanMethods = false)
 	@RefreshScope
 	public static class ExampleService {
 
@@ -62,7 +61,7 @@ public class ImportRefreshScopeIntegrationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import({ RefreshAutoConfiguration.class, ExampleService.class })
 	protected static class TestConfiguration {
 

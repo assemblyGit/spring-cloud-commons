@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
  */
 class ClientFactoryObjectProvider<T> implements ObjectProvider<T> {
 
-	private final NamedContextFactory clientFactory;
+	private final NamedContextFactory<?> clientFactory;
 
 	private final String name;
 
@@ -42,8 +42,7 @@ class ClientFactoryObjectProvider<T> implements ObjectProvider<T> {
 
 	private ObjectProvider<T> provider;
 
-	ClientFactoryObjectProvider(NamedContextFactory clientFactory, String name,
-			Class<T> type) {
+	ClientFactoryObjectProvider(NamedContextFactory<?> clientFactory, String name, Class<T> type) {
 		this.clientFactory = clientFactory;
 		this.name = name;
 		this.type = type;
@@ -111,7 +110,6 @@ class ClientFactoryObjectProvider<T> implements ObjectProvider<T> {
 		return delegate().spliterator();
 	}
 
-	@SuppressWarnings("unchecked")
 	private ObjectProvider<T> delegate() {
 		if (this.provider == null) {
 			this.provider = this.clientFactory.getProvider(this.name, this.type);

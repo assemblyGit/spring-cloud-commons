@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,7 @@ public class EncryptorFactory {
 
 			try {
 				String normalizedPemData = normalizePem(data);
-				encryptor = new RsaSecretEncryptor(
-						NEWLINE_ESCAPE_PATTERN.matcher(normalizedPemData).replaceAll(""));
+				encryptor = new RsaSecretEncryptor(NEWLINE_ESCAPE_PATTERN.matcher(normalizedPemData).replaceAll(""));
 			}
 			catch (IllegalArgumentException e) {
 				throw new KeyFormatException(e);
@@ -82,8 +81,7 @@ public class EncryptorFactory {
 
 			StringWriter textWriter = new StringWriter();
 			try (PemWriter pemWriter = new PemWriter(textWriter)) {
-				PemObjectGenerator pemObjectGenerator = new MiscPEMGenerator(
-						privateKeyInfo);
+				PemObjectGenerator pemObjectGenerator = new MiscPEMGenerator(privateKeyInfo);
 
 				pemWriter.writeObject(pemObjectGenerator);
 				pemWriter.flush();

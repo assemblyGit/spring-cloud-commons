@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,16 @@ import org.springframework.http.client.AsyncClientHttpRequestInterceptor;
 import org.springframework.web.client.AsyncRestTemplate;
 
 /**
- * Auto-configuration for Ribbon (client-side load balancing).
+ * Auto-configuration for blocking client-side load balancing.
  *
  * @author Rob Worsnop
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnBean(LoadBalancerClient.class)
 @ConditionalOnClass(AsyncRestTemplate.class)
 public class AsyncLoadBalancerAutoConfiguration {
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class AsyncRestTemplateCustomizerConfig {
 
 		@LoadBalanced
@@ -49,13 +49,10 @@ public class AsyncLoadBalancerAutoConfiguration {
 		@Bean
 		public SmartInitializingSingleton loadBalancedAsyncRestTemplateInitializer(
 				final List<AsyncRestTemplateCustomizer> customizers) {
-			return new SmartInitializingSingleton() {
-				@Override
-				public void afterSingletonsInstantiated() {
-					for (AsyncRestTemplate restTemplate : AsyncRestTemplateCustomizerConfig.this.restTemplates) {
-						for (AsyncRestTemplateCustomizer customizer : customizers) {
-							customizer.customize(restTemplate);
-						}
+			return () -> {
+				for (AsyncRestTemplate restTemplate : AsyncRestTemplateCustomizerConfig.this.restTemplates) {
+					for (AsyncRestTemplateCustomizer customizer : customizers) {
+						customizer.customize(restTemplate);
 					}
 				}
 			};
@@ -63,26 +60,21 @@ public class AsyncLoadBalancerAutoConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class LoadBalancerInterceptorConfig {
 
 		@Bean
-		public AsyncLoadBalancerInterceptor asyncLoadBalancerInterceptor(
-				LoadBalancerClient loadBalancerClient) {
+		public AsyncLoadBalancerInterceptor asyncLoadBalancerInterceptor(LoadBalancerClient loadBalancerClient) {
 			return new AsyncLoadBalancerInterceptor(loadBalancerClient);
 		}
 
 		@Bean
 		public AsyncRestTemplateCustomizer asyncRestTemplateCustomizer(
 				final AsyncLoadBalancerInterceptor loadBalancerInterceptor) {
-			return new AsyncRestTemplateCustomizer() {
-				@Override
-				public void customize(AsyncRestTemplate restTemplate) {
-					List<AsyncClientHttpRequestInterceptor> list = new ArrayList<>(
-							restTemplate.getInterceptors());
-					list.add(loadBalancerInterceptor);
-					restTemplate.setInterceptors(list);
-				}
+			return restTemplate -> {
+				List<AsyncClientHttpRequestInterceptor> list = new ArrayList<>(restTemplate.getInterceptors());
+				list.add(loadBalancerInterceptor);
+				restTemplate.setInterceptors(list);
 			};
 		}
 

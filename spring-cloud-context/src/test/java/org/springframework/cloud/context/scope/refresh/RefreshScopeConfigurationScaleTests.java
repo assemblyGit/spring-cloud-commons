@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 		"logging.level.org.springframework.cloud.context.scope.refresh.RefreshScopeConfigurationScaleTests=DEBUG" })
 public class RefreshScopeConfigurationScaleTests {
 
-	private static Log logger = LogFactory
-			.getLog(RefreshScopeConfigurationScaleTests.class);
+	private static Log logger = LogFactory.getLog(RefreshScopeConfigurationScaleTests.class);
 
 	@Autowired
 	org.springframework.cloud.context.scope.refresh.RefreshScope scope;
@@ -90,8 +89,7 @@ public class RefreshScopeConfigurationScaleTests {
 				public String call() throws Exception {
 					logger.debug("Background started.");
 					try {
-						return RefreshScopeConfigurationScaleTests.this.service
-								.getMessage();
+						return RefreshScopeConfigurationScaleTests.this.service.getMessage();
 					}
 					finally {
 						latch.countDown();
@@ -120,8 +118,7 @@ public class RefreshScopeConfigurationScaleTests {
 
 	}
 
-	public static class ExampleService
-			implements Service, InitializingBean, DisposableBean {
+	public static class ExampleService implements Service, InitializingBean, DisposableBean {
 
 		private static Log logger = LogFactory.getLog(ExampleService.class);
 
@@ -135,44 +132,38 @@ public class RefreshScopeConfigurationScaleTests {
 
 		@Override
 		public void afterPropertiesSet() throws Exception {
-			logger.debug("Initializing: " + ObjectUtils.getIdentityHexString(this) + ", "
-					+ this.message);
+			logger.debug("Initializing: " + ObjectUtils.getIdentityHexString(this) + ", " + this.message);
 			try {
 				Thread.sleep(this.delay);
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			logger.debug("Initialized: " + ObjectUtils.getIdentityHexString(this) + ", "
-					+ this.message);
+			logger.debug("Initialized: " + ObjectUtils.getIdentityHexString(this) + ", " + this.message);
 		}
 
 		@Override
 		public void destroy() throws Exception {
-			logger.debug("Destroying message: " + ObjectUtils.getIdentityHexString(this)
-					+ ", " + this.message);
+			logger.debug("Destroying message: " + ObjectUtils.getIdentityHexString(this) + ", " + this.message);
 			this.message = null;
 		}
 
 		@Override
 		public String getMessage() {
-			logger.debug("Returning message: " + ObjectUtils.getIdentityHexString(this)
-					+ ", " + this.message);
+			logger.debug("Returning message: " + ObjectUtils.getIdentityHexString(this) + ", " + this.message);
 			return this.message;
 		}
 
 		public void setMessage(String message) {
-			logger.debug("Setting message: " + ObjectUtils.getIdentityHexString(this)
-					+ ", " + message);
+			logger.debug("Setting message: " + ObjectUtils.getIdentityHexString(this) + ", " + message);
 			this.message = message;
 		}
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
-	@Import({ RefreshAutoConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
+	@Import({ RefreshAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
 	protected static class TestConfiguration {
 
 		@Bean

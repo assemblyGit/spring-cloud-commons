@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.bootstrap.BootstrapOrderingCustomPropertySourceIntegrationTests.Application;
-import org.springframework.cloud.bootstrap.config.PropertySourceBootstrapConfiguration;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -41,8 +39,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.BDDAssertions.then;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class,
-		properties = { "encrypt.key:deadbeef", "spring.cloud.bootstrap.name:custom" })
+@SpringBootTest(classes = Application.class, properties = { "encrypt.key:deadbeef",
+		"spring.cloud.bootstrap.name:custom", "spring.config.use-legacy-processing=true" })
 @ActiveProfiles("encrypt")
 public class BootstrapOrderingCustomPropertySourceIntegrationTests {
 
@@ -50,11 +48,9 @@ public class BootstrapOrderingCustomPropertySourceIntegrationTests {
 	private ConfigurableEnvironment environment;
 
 	@Test
-	@Ignore // FIXME: spring boot 2.0.0
 	public void bootstrapPropertiesExist() {
-		then(this.environment.getPropertySources().contains(
-				PropertySourceBootstrapConfiguration.BOOTSTRAP_PROPERTY_SOURCE_NAME))
-						.isTrue();
+		then(this.environment.getPropertySources().contains("applicationConfig: [classpath:/custom.properties]"))
+				.isTrue();
 	}
 
 	@Test
@@ -63,18 +59,17 @@ public class BootstrapOrderingCustomPropertySourceIntegrationTests {
 	}
 
 	@EnableAutoConfiguration
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class Application {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	// This is added to bootstrap context as a source in bootstrap.properties
 	protected static class PropertySourceConfiguration implements PropertySourceLocator {
 
-		public static Map<String, Object> MAP = new HashMap<String, Object>(
-				Collections.<String, Object>singletonMap("custom.foo",
-						"{cipher}6154ca04d4bb6144d672c4e3d750b5147116dd381946d51fa44f8bc25dc256f4"));
+		public static Map<String, Object> MAP = new HashMap<String, Object>(Collections.<String, Object>singletonMap(
+				"custom.foo", "{cipher}6154ca04d4bb6144d672c4e3d750b5147116dd381946d51fa44f8bc25dc256f4"));
 
 		@Override
 		public PropertySource<?> locate(Environment environment) {

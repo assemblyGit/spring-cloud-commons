@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,33 +20,47 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerProperties;
+import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerClientAutoConfiguration;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClientSpecification;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Spencer Gibb
+ * @author Olga Maciaszek-Sharma
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @LoadBalancerClients
-// @EnableCaching //TODO: how to enforce, or check conditions?
-// @AutoConfigureBefore(CacheAutoConfiguration.class)
+@EnableConfigurationProperties(LoadBalancerProperties.class)
+@AutoConfigureBefore({ ReactorLoadBalancerClientAutoConfiguration.class,
+		LoadBalancerBeanPostProcessorAutoConfiguration.class })
 public class LoadBalancerAutoConfiguration {
 
 	private final ObjectProvider<List<LoadBalancerClientSpecification>> configurations;
 
-	public LoadBalancerAutoConfiguration(
-			ObjectProvider<List<LoadBalancerClientSpecification>> configurations) {
+	public LoadBalancerAutoConfiguration(ObjectProvider<List<LoadBalancerClientSpecification>> configurations) {
 		this.configurations = configurations;
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	public LoadBalancerZoneConfig zoneConfig(Environment environment) {
+		return new LoadBalancerZoneConfig(environment.getProperty("spring.cloud.loadbalancer.zone"));
+	}
+
+	@ConditionalOnMissingBean
+	@Bean
 	public LoadBalancerClientFactory loadBalancerClientFactory() {
 		LoadBalancerClientFactory clientFactory = new LoadBalancerClientFactory();
-		clientFactory.setConfigurations(
-				this.configurations.getIfAvailable(Collections::emptyList));
+		clientFactory.setConfigurations(this.configurations.getIfAvailable(Collections::emptyList));
 		return clientFactory;
 	}
 

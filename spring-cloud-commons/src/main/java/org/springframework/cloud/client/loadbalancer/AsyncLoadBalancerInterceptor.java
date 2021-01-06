@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.springframework.cloud.client.loadbalancer;
 import java.io.IOException;
 import java.net.URI;
 
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.AsyncClientHttpRequestExecution;
 import org.springframework.http.client.AsyncClientHttpRequestInterceptor;
@@ -38,22 +37,15 @@ public class AsyncLoadBalancerInterceptor implements AsyncClientHttpRequestInter
 	}
 
 	@Override
-	public ListenableFuture<ClientHttpResponse> intercept(final HttpRequest request,
-			final byte[] body, final AsyncClientHttpRequestExecution execution)
-			throws IOException {
+	public ListenableFuture<ClientHttpResponse> intercept(final HttpRequest request, final byte[] body,
+			final AsyncClientHttpRequestExecution execution) throws IOException {
 		final URI originalUri = request.getURI();
 		String serviceName = originalUri.getHost();
-		return this.loadBalancer.execute(serviceName,
-				new LoadBalancerRequest<ListenableFuture<ClientHttpResponse>>() {
-					@Override
-					public ListenableFuture<ClientHttpResponse> apply(
-							final ServiceInstance instance) throws Exception {
-						HttpRequest serviceRequest = new ServiceRequestWrapper(request,
-								instance, AsyncLoadBalancerInterceptor.this.loadBalancer);
-						return execution.executeAsync(serviceRequest, body);
-					}
-
-				});
+		return this.loadBalancer.execute(serviceName, instance -> {
+			HttpRequest serviceRequest = new ServiceRequestWrapper(request, instance,
+					AsyncLoadBalancerInterceptor.this.loadBalancer);
+			return execution.executeAsync(serviceRequest, body);
+		});
 	}
 
 }

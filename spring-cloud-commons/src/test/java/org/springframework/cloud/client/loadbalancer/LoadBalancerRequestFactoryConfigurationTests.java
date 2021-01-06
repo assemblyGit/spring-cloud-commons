@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactiveLoadBalancer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,14 +74,12 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 	}
 
 	protected ConfigurableApplicationContext init(Class<?> config) {
-		ConfigurableApplicationContext context = new SpringApplicationBuilder()
-				.web(WebApplicationType.NONE)
-				.properties("spring.aop.proxyTargetClass=true")
-				.sources(config, LoadBalancerAutoConfiguration.class).run();
+		ConfigurableApplicationContext context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
+				.properties("spring.aop.proxyTargetClass=true").sources(config, LoadBalancerAutoConfiguration.class)
+				.run();
 
 		this.lbReqFactory = context.getBean(LoadBalancerRequestFactory.class);
-		this.lbRequest = this.lbReqFactory.createRequest(this.request, this.body,
-				this.execution);
+		this.lbRequest = this.lbReqFactory.createRequest(this.request, this.body, this.execution);
 		return context;
 	}
 
@@ -89,14 +89,14 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 
 		LoadBalancerRequestTransformer transformer = context.getBean("transformer",
 				LoadBalancerRequestTransformer.class);
-		when(transformer.transformRequest(any(ServiceRequestWrapper.class),
-				eq(this.instance))).thenReturn(this.transformedRequest);
+		when(transformer.transformRequest(any(ServiceRequestWrapper.class), eq(this.instance)))
+				.thenReturn(this.transformedRequest);
 
 		this.lbRequest.apply(this.instance);
 
 		verify(this.execution).execute(this.httpRequestCaptor.capture(), eq(this.body));
-		then(this.httpRequestCaptor.getValue()).as(
-				"transformer should have transformed the ServiceRequestWrapper into transformedRequest")
+		then(this.httpRequestCaptor.getValue())
+				.as("transformer should have transformed the ServiceRequestWrapper into transformedRequest")
 				.isEqualTo(this.transformedRequest);
 	}
 
@@ -107,8 +107,7 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 		this.lbRequest.apply(this.instance);
 
 		verify(this.execution).execute(this.httpRequestCaptor.capture(), eq(this.body));
-		then(this.httpRequestCaptor.getValue().getClass())
-				.as("ServiceRequestWrapper should be executed")
+		then(this.httpRequestCaptor.getValue().getClass()).as("ServiceRequestWrapper should be executed")
 				.isEqualTo(ServiceRequestWrapper.class);
 	}
 
@@ -118,8 +117,8 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 
 		LoadBalancerRequestTransformer transformer = context.getBean("transformer",
 				LoadBalancerRequestTransformer.class);
-		when(transformer.transformRequest(any(ServiceRequestWrapper.class),
-				eq(this.instance))).thenReturn(this.transformedRequest);
+		when(transformer.transformRequest(any(ServiceRequestWrapper.class), eq(this.instance)))
+				.thenReturn(this.transformedRequest);
 		LoadBalancerRequestTransformer transformer2 = context.getBean("transformer2",
 				LoadBalancerRequestTransformer.class);
 		when(transformer2.transformRequest(this.transformedRequest, this.instance))
@@ -128,18 +127,13 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 		this.lbRequest.apply(this.instance);
 
 		verify(this.execution).execute(this.httpRequestCaptor.capture(), eq(this.body));
-		then(this.httpRequestCaptor.getValue())
-				.as("transformer2 should run after transformer")
+		then(this.httpRequestCaptor.getValue()).as("transformer2 should run after transformer")
 				.isEqualTo(this.transformedRequest2);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
+	@Import(NoTransformer.class)
 	static class Transformer {
-
-		@Bean
-		public LoadBalancerClient loadBalancerClient() {
-			return mock(LoadBalancerClient.class);
-		}
 
 		@Bean
 		public LoadBalancerRequestTransformer transformer() {
@@ -148,18 +142,9 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
+	@Import(Transformer.class)
 	static class TransformersAreOrdered {
-
-		@Bean
-		public LoadBalancerClient loadBalancerClient() {
-			return mock(LoadBalancerClient.class);
-		}
-
-		@Bean
-		public LoadBalancerRequestTransformer transformer() {
-			return mock(LoadBalancerRequestTransformer.class);
-		}
 
 		@Bean
 		@Order(LoadBalancerRequestTransformer.DEFAULT_ORDER + 1)
@@ -169,12 +154,18 @@ public class LoadBalancerRequestFactoryConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class NoTransformer {
 
 		@Bean
 		public LoadBalancerClient loadBalancerClient() {
 			return mock(LoadBalancerClient.class);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Bean
+		ReactiveLoadBalancer.Factory<ServiceInstance> factory() {
+			return mock(ReactiveLoadBalancer.Factory.class);
 		}
 
 	}

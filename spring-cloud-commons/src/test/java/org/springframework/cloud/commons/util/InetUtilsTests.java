@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,7 @@ public class InetUtilsTests {
 		try (InetUtils inetUtils = new InetUtils(properties)) {
 
 			then(inetUtils.ignoreInterface("docker0")).isTrue().as("docker0 not ignored");
-			then(inetUtils.ignoreInterface("vethAQI2QT")).as("vethAQI2QT0 not ignored")
-					.isTrue();
+			then(inetUtils.ignoreInterface("vethAQI2QT")).as("vethAQI2QT0 not ignored").isTrue();
 			then(inetUtils.ignoreInterface("docker1")).as("docker1 ignored").isFalse();
 		}
 	}
@@ -105,8 +104,7 @@ public class InetUtilsTests {
 			then(utils.isPreferredAddress(InetAddress.getByName("192.168.0.1"))).isTrue();
 			then(utils.isPreferredAddress(InetAddress.getByName("5.5.8.1"))).isFalse();
 			then(utils.isPreferredAddress(InetAddress.getByName("10.0.10.1"))).isTrue();
-			then(utils.isPreferredAddress(InetAddress.getByName("10.255.10.1")))
-					.isFalse();
+			then(utils.isPreferredAddress(InetAddress.getByName("10.255.10.1"))).isFalse();
 		}
 	}
 
@@ -118,8 +116,7 @@ public class InetUtilsTests {
 		try (InetUtils utils = new InetUtils(properties)) {
 			then(utils.isPreferredAddress(InetAddress.getByName("192.168.0.1"))).isTrue();
 			then(utils.isPreferredAddress(InetAddress.getByName("5.5.8.1"))).isFalse();
-			then(utils.isPreferredAddress(InetAddress.getByName("10.255.10.1")))
-					.isFalse();
+			then(utils.isPreferredAddress(InetAddress.getByName("10.255.10.1"))).isFalse();
 			then(utils.isPreferredAddress(InetAddress.getByName("10.0.10.1"))).isTrue();
 		}
 	}

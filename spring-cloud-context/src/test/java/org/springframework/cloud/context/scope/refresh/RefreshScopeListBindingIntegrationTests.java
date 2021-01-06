@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.BDDAssertions.then;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestConfiguration.class,
-		properties = { "test.messages[0]=one", "test.messages[1]=two" })
+@SpringBootTest(classes = TestConfiguration.class, properties = { "test.messages[0]=one", "test.messages[1]=two" })
 public class RefreshScopeListBindingIntegrationTests {
 
 	@Autowired
@@ -91,10 +90,9 @@ public class RefreshScopeListBindingIntegrationTests {
 		throw new IllegalStateException("Could not find test property source");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
-	@Import({ RefreshAutoConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
+	@Import({ RefreshAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
 	protected static class TestConfiguration {
 
 		@Bean

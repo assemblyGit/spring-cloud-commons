@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.junit.runners.Suite.SuiteClasses;
 		org.springframework.cloud.logging.LoggingRebinderTests.class,
 		org.springframework.cloud.bootstrap.BootstrapSourcesOrderingTests.class,
 		org.springframework.cloud.bootstrap.BootstrapDisabledAutoConfigurationIntegrationTests.class,
-		org.springframework.cloud.bootstrap.BootstrapEnvironmentPostProcessorIntegrationTests.class,
 		org.springframework.cloud.bootstrap.encrypt.RsaDisabledTests.class,
 		org.springframework.cloud.bootstrap.encrypt.EncryptorFactoryTests.class,
 		org.springframework.cloud.bootstrap.encrypt.EnvironmentDecryptApplicationInitializerTests.class,
@@ -50,6 +49,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		org.springframework.cloud.context.properties.ConfigurationPropertiesRebinderListIntegrationTests.class,
 		org.springframework.cloud.context.properties.ConfigurationPropertiesRebinderLifecycleIntegrationTests.class,
 		org.springframework.cloud.context.named.NamedContextFactoryTests.class,
+		org.springframework.cloud.context.refresh.ContextRefresherOrderingIntegrationTests.class,
 		org.springframework.cloud.context.refresh.ContextRefresherIntegrationTests.class,
 		org.springframework.cloud.context.refresh.ContextRefresherTests.class,
 		org.springframework.cloud.context.environment.EnvironmentManagerTest.class,

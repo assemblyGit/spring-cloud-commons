@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,13 @@ import org.springframework.security.rsa.crypto.RsaAlgorithm;
  * @author Ryan Baxter
  */
 @ConditionalOnClass(RsaAlgorithm.class)
-@ConfigurationProperties("encrypt.rsa")
+@ConfigurationProperties(RsaProperties.PREFIX)
 public class RsaProperties {
+
+	/**
+	 * ConfigurationProperties prefix for RsaProperties.
+	 */
+	public static final String PREFIX = "encrypt.rsa";
 
 	/**
 	 * The RSA algorithm to use (DEFAULT or OEAP). Once it is set, do not change it (or

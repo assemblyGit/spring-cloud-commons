@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.cloud.test.ClassPathExclusions;
 import org.springframework.cloud.test.ModifiedClassPathRunner;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -35,31 +35,28 @@ import static org.assertj.core.api.BDDAssertions.then;
  * @author Spencer Gibb
  */
 @RunWith(ModifiedClassPathRunner.class)
-@ClassPathExclusions({ "spring-boot-actuator-autoconfigure-*.jar",
-		"spring-boot-starter-actuator-*.jar" })
+@ClassPathExclusions({ "spring-boot-actuator-autoconfigure-*.jar", "spring-boot-starter-actuator-*.jar" })
 public class RefreshAutoConfigurationMoreClassPathTests {
 
 	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
+	public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
-	private static ConfigurableApplicationContext getApplicationContext(
-			Class<?> configuration, String... properties) {
-		return new SpringApplicationBuilder(configuration).web(WebApplicationType.NONE)
-				.properties(properties).run();
+	private static ConfigurableApplicationContext getApplicationContext(Class<?> configuration, String... properties) {
+		return new SpringApplicationBuilder(configuration).web(WebApplicationType.NONE).properties(properties).run();
 	}
 
 	@Test
 	public void unknownClassProtected() {
-		try (ConfigurableApplicationContext context = getApplicationContext(Config.class,
-				"debug=true")) {
+		try (ConfigurableApplicationContext context = getApplicationContext(Config.class, "debug=true")) {
 			String output = this.outputCapture.toString();
-			then(output).doesNotContain("Failed to introspect annotations on "
-					+ "[class org.springframework.cloud.autoconfigure.RefreshEndpointAutoConfiguration")
+			then(output)
+					.doesNotContain("Failed to introspect annotations on "
+							+ "[class org.springframework.cloud.autoconfigure.RefreshEndpointAutoConfiguration")
 					.doesNotContain("TypeNotPresentExceptionProxy");
 		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 

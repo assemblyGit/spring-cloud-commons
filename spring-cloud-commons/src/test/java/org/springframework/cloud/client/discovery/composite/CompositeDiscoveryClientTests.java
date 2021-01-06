@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,12 @@ import static org.springframework.cloud.client.discovery.composite.CompositeDisc
  */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=service0",
-		"spring.cloud.discovery.client.simple.instances.service1[0].uri=http://s11:8080",
-		"spring.cloud.discovery.client.simple.instances.service1[1].uri=https://s12:8443",
-		"spring.cloud.discovery.client.simple.instances.service2[0].uri=https://s21:8080",
-		"spring.cloud.discovery.client.simple.instances.service2[1].uri=https://s22:443" },
+@SpringBootTest(
+		properties = { "spring.application.name=service0",
+				"spring.cloud.discovery.client.simple.instances.service1[0].uri=http://s11:8080",
+				"spring.cloud.discovery.client.simple.instances.service1[1].uri=https://s12:8443",
+				"spring.cloud.discovery.client.simple.instances.service2[0].uri=https://s21:8080",
+				"spring.cloud.discovery.client.simple.instances.service2[1].uri=https://s22:443" },
 		classes = { CompositeDiscoveryClientTestsConfig.class })
 public class CompositeDiscoveryClientTests {
 
@@ -63,8 +64,7 @@ public class CompositeDiscoveryClientTests {
 
 	@Test
 	public void getServicesShouldAggregateAllServiceNames() {
-		then(this.discoveryClient.getServices()).containsOnlyOnce("service1", "service2",
-				"custom");
+		then(this.discoveryClient.getServices()).containsOnlyOnce("service1", "service2", "custom");
 	}
 
 	@Test

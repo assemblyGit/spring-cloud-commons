@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.health.HealthAggregator;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -36,7 +34,7 @@ import org.springframework.cloud.client.actuator.HasFeatures;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.health.DiscoveryClientHealthIndicator;
 import org.springframework.cloud.client.discovery.health.DiscoveryClientHealthIndicatorProperties;
-import org.springframework.cloud.client.discovery.health.DiscoveryCompositeHealthIndicator;
+import org.springframework.cloud.client.discovery.health.DiscoveryCompositeHealthContributor;
 import org.springframework.cloud.client.discovery.health.DiscoveryHealthIndicator;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
@@ -47,47 +45,43 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Spencer Gibb
  * @author Olga Maciaszek-Sharma
+ * @author Tim Ysewyn
  */
-@Configuration
-@AutoConfigureOrder(0)
+@Configuration(proxyBeanMethods = false)
 public class CommonsClientAutoConfiguration {
 
-	@Configuration
-	@EnableConfigurationProperties(DiscoveryClientHealthIndicatorProperties.class)
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(HealthIndicator.class)
+	@EnableConfigurationProperties(DiscoveryClientHealthIndicatorProperties.class)
 	@ConditionalOnBean(DiscoveryClient.class)
 	@ConditionalOnDiscoveryEnabled
+	@ConditionalOnBlockingDiscoveryEnabled
 	protected static class DiscoveryLoadBalancerConfiguration {
 
 		@Bean
-		@ConditionalOnProperty(
-				value = "spring.cloud.discovery.client.health-indicator.enabled",
-				matchIfMissing = true)
+		@ConditionalOnDiscoveryHealthIndicatorEnabled
 		public DiscoveryClientHealthIndicator discoveryClientHealthIndicator(
-				ObjectProvider<DiscoveryClient> discoveryClient,
-				DiscoveryClientHealthIndicatorProperties properties) {
+				ObjectProvider<DiscoveryClient> discoveryClient, DiscoveryClientHealthIndicatorProperties properties) {
 			return new DiscoveryClientHealthIndicator(discoveryClient, properties);
 		}
 
 		@Bean
-		@ConditionalOnProperty(
-				value = "spring.cloud.discovery.client.composite-indicator.enabled",
+		@ConditionalOnProperty(value = "spring.cloud.discovery.client.composite-indicator.enabled",
 				matchIfMissing = true)
-		@ConditionalOnBean({ DiscoveryHealthIndicator.class, HealthAggregator.class })
-		public DiscoveryCompositeHealthIndicator discoveryCompositeHealthIndicator(
-				HealthAggregator aggregator, List<DiscoveryHealthIndicator> indicators) {
-			return new DiscoveryCompositeHealthIndicator(aggregator, indicators);
+		@ConditionalOnBean({ DiscoveryHealthIndicator.class })
+		public DiscoveryCompositeHealthContributor discoveryCompositeHealthContributor(
+				List<DiscoveryHealthIndicator> indicators) {
+			return new DiscoveryCompositeHealthContributor(indicators);
 		}
 
 		@Bean
 		public HasFeatures commonsFeatures() {
-			return HasFeatures.abstractFeatures(DiscoveryClient.class,
-					LoadBalancerClient.class);
+			return HasFeatures.abstractFeatures(DiscoveryClient.class, LoadBalancerClient.class);
 		}
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(Endpoint.class)
 	@ConditionalOnProperty(value = "spring.cloud.features.enabled", matchIfMissing = true)
 	protected static class ActuatorConfiguration {
@@ -96,7 +90,7 @@ public class CommonsClientAutoConfiguration {
 		private List<HasFeatures> hasFeatures = new ArrayList<>();
 
 		@Bean
-		@ConditionalOnEnabledEndpoint
+		@ConditionalOnAvailableEndpoint
 		public FeaturesEndpoint featuresEndpoint() {
 			return new FeaturesEndpoint(this.hasFeatures);
 		}

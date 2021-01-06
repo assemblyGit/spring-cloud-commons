@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,11 @@ import org.springframework.core.annotation.Order;
  * @author Spencer Gibb
  */
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
-public class EnableCircuitBreakerImportSelector
-		extends SpringFactoryImportSelector<EnableCircuitBreaker> {
+public class EnableCircuitBreakerImportSelector extends SpringFactoryImportSelector<EnableCircuitBreaker> {
 
 	@Override
 	protected boolean isEnabled() {
-		return getEnvironment().getProperty("spring.cloud.circuit.breaker.enabled",
-				Boolean.class, Boolean.TRUE);
+		return getEnvironment().getProperty("spring.cloud.circuit.breaker.enabled", Boolean.class, Boolean.TRUE);
 	}
 
 }
